@@ -232,6 +232,9 @@ function get_bc!(rbc::AbstractVector, r_flat::AbstractVector, domain::StreamFcnG
         @views @. rbc[R+jbc] = 0.5 * (r[3*nx÷4, j] + r[3*nx÷4, j-1])
     end
 
+    # Account for scaling between grids
+    rbc .*= 0.25
+
     return nothing
 end
 

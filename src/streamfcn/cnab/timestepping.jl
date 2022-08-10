@@ -79,9 +79,6 @@ function (mem::GetTrialState)(qs::AbstractMatrix, Γs::AbstractMatrix, state::St
         if lev < nlevel
             @views get_bc!(bc, qty.Γ[:, lev+1], domain)
 
-            # Account for scaling between grids
-            bc .*= 0.25
-
             fac = 0.25 * dt / (fluid.Re * hc^2)
             apply_bc!(rhsbc, bc, fac, domain)
         end
