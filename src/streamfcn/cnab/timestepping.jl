@@ -25,7 +25,7 @@ function (mem::Nonlinear)(
     # plus factor of 4 from averaging across cells above
     # (applies to flux field, but this avoids a second operation)
     hc = gridstep(grid, lev) # Coarse grid spacing
-    nonlin .*= 1 / (4 * hc^2)
+    nonlin .*= 1 / hc^2
 
     return nothing
 end

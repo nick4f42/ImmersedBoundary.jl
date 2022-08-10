@@ -334,7 +334,7 @@ function direct_product_loops!(fq, Q, Γ, Γbc, domain::StreamFcnGrid)
         Qy2 = Qy[i, j],
         Γ2 = Γ[i.-1, j.-1]
 
-        @. fqx = Qy1 * Γ1 + Qy2 * Γ2
+        @. fqx = (Qy1 * Γ1 + Qy2 * Γ2) / 2
     end
 
     # x fluxes bottom boundary
@@ -346,7 +346,7 @@ function direct_product_loops!(fq, Q, Γ, Γbc, domain::StreamFcnGrid)
         Qy2 = Qy[i, j],
         Γ2 = Γbc[B.+i]
 
-        @. fqx = Qy1 * Γ1 + Qy2 * Γ2
+        @. fqx = (Qy1 * Γ1 + Qy2 * Γ2) / 2
     end
 
     # x fluxes top boundary
@@ -358,7 +358,7 @@ function direct_product_loops!(fq, Q, Γ, Γbc, domain::StreamFcnGrid)
         Qy2 = Qy[i, j.+1],
         Γ2 = Γbc[T.+i]
 
-        @. fqx = Qy1 * Γ1 + Qy2 * Γ2
+        @. fqx = (Qy1 * Γ1 + Qy2 * Γ2) / 2
     end
 
     # y fluxes
@@ -370,7 +370,7 @@ function direct_product_loops!(fq, Q, Γ, Γbc, domain::StreamFcnGrid)
         Qx2 = Qx[i, j],
         Γ2 = Γ[i.-1, j.-1]
 
-        @. fqy = -(Qx1 * Γ1 + Qx2 * Γ2)
+        @. fqy = -(Qx1 * Γ1 + Qx2 * Γ2) / 2
     end
 
     # y fluxes left boundary
@@ -382,7 +382,7 @@ function direct_product_loops!(fq, Q, Γ, Γbc, domain::StreamFcnGrid)
         Qx2 = Qx[i, j],
         Γ2 = Γbc[L.+j]
 
-        @. fqy = -(Qx1 * Γ1 + Qx2 * Γ2)
+        @. fqy = -(Qx1 * Γ1 + Qx2 * Γ2) / 2
     end
 
     # y fluxes right boundary
@@ -394,7 +394,7 @@ function direct_product_loops!(fq, Q, Γ, Γbc, domain::StreamFcnGrid)
         Qx2 = Qx[i.+1, j],
         Γ2 = Γbc[R.+j]
 
-        @. fqy = -(Qx1 * Γ1 + Qx2 * Γ2)
+        @. fqy = -(Qx1 * Γ1 + Qx2 * Γ2) / 2
     end
 
     return nothing
