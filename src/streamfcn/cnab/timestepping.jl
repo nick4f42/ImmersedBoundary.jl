@@ -51,6 +51,9 @@ function (mem::GetTrialState)(qs::AbstractMatrix, Γs::AbstractMatrix, state::St
             apply_bc!(rhsbc, bc, fac, domain)
         end
 
+        # Account for scaling between grids
+        # Don't need bc's for anything after this, so we can rescale in place
+        bc .*= 0.25
         #compute the nonlinear term for the current time step
         @views nonlinear!(nonlin[1][:, lev], qty, bc, lev)
 
