@@ -67,7 +67,7 @@ function update_stress!(qty::StreamFcnQuantities, prob::Problem{<:StreamFcnFluid
 
         # Surface stress * ds
         fb = qty.stress[j].fb
-        @.fb = F * h / dt
+        @. fb = F * h / dt
 
         # Integrated forces
         CD = 2 * sum(@view fb[:, 1])
@@ -92,8 +92,8 @@ function Base.copy!(dst::StreamFcnQuantities, src::StreamFcnQuantities)
     copyto!(dst.q0, src.q0)
     copyto!(dst.Γ, src.Γ)
     copyto!(dst.ψ, src.ψ)
-    copyto!(dst.fb, src.fb)
     copyto!(dst.Fb, src.Fb)
+    copyto!(dst.stress, src.stress)
     copy!(dst.points, src.points)
 
     return dst
@@ -105,12 +105,10 @@ function Base.similar(v::StreamFcnQuantities)
     Γ = similar(v.Γ)
     ψ = similar(v.ψ)
     Fb = similar(v.Fb)
-    fb = similar(v.fb)
-    CD = similar(v.CD)
-    CL = similar(v.CL)
+    stress = similar(v.stress)
     points = similar(v.points)
 
-    return StreamFcnQuantities(q, q0, Γ, ψ, Fb, fb, CD, CL, points)
+    return StreamFcnQuantities(q, q0, Γ, ψ, Fb, stress, points)
 end
 
 "Out of place scalar multiplication; multiply vector v with scalar α and store the result in w"

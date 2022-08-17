@@ -65,6 +65,11 @@ function B_Times(domain::StreamFcnGrid, vort2flux::Vort2Flux, Γtmp, qtmp; Ainv,
     return B_Times(vort2flux, Ainv, C, E, Γtmp, qtmp, Γ, ψ, q)
 end
 
+function B_linearmap(prob::Problem, B_times::B_Times)
+    nftot = 2 * (npoints ∘ bodygroup)(prob)
+    return LinearMap(B_times, nftot; issymmetric=true)
+end
+
 """
 Precompute 'Binv' matrix by evaluating mat-vec products for unit vectors
 
@@ -72,12 +77,12 @@ This is a big speedup when the interpolation operator E isn't going to
 change (no FSI, for instance)
 """
 function Binv_linearmap(
-    prob::Problem{<:StreamFcnFluid{<:StreamFcnGrid{LabFrame}}}, B_times!::B_Times
+    prob::Problem{<:StreamFcnFluid{<:StreamFcnGrid{LabFrame}}}, B
 )
     nftot = 2 * (npoints ∘ bodygroup)(prob)
 
     # Pre-allocate arrays
-    B = zeros(nftot, nftot)
+    Bmat = zeros(nftot, nftot)
     e = zeros(nftot) # Unit vector
 
     for j in 1:nftot
@@ -85,22 +90,19 @@ function Binv_linearmap(
         e[max(1, j - 1)] = 0
         e[j] = 1
 
-        @views B_times!(B[:, j], e)
+        @views mul!(Bmat[:, j], B, e)
     end
 
-    Binv = inv(B)
+    Binv = inv(Bmat)
     return LinearMap((y, x) -> mul!(y, Binv, x), nftot; issymmetric=true)
 
     # TODO: Diagnose why cholesky decomposition leads to non-hermitian error
-    # B_decomp = cholesky!(B)
+    # B_decomp = cholesky!(Bmat)
     # return LinearMap((y, x) -> ldiv!(y, B_decomp, x), nftot; issymmetric=true)
 end
 
-function Binv_linearmap(prob::Problem, B_times::B_Times)
+function Binv_linearmap(prob::Problem, B)
     nftot = 2 * (npoints ∘ bodygroup)(prob)
-
-    # f = B*g
-    B = LinearMap(B_times, nftot; issymmetric=true)
 
     # solves f = B*g for g... so g = Binv * f
     # TODO: Add external interface for cg! options

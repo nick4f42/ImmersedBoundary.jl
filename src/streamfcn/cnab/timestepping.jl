@@ -168,21 +168,21 @@ function (mem::CircProjecter)(qty::StreamFcnQuantities, Γs::AbstractMatrix)
 end
 
 struct Solver{
-    D<:StreamFcnGrid,
-    P<:Problem{StreamFcnFluid{D}},
-    GS<:GetTrialState,
-    BF<:BoundaryForcer,
-    PC<:CircProjecter,
-    VF<:Vort2Flux,
+    P<:Problem{<:StreamFcnFluid{<:StreamFcnGrid}},
+    R<:Reg,
+    G<:GetTrialState,
+    B<:BoundaryForcer,
+    C<:CircProjecter,
+    V<:Vort2Flux,
 } <: AbstractSolver
     prob::P
     qs::Matrix{Float64} # Trial flux
     Γs::Matrix{Float64} # Trial circulation
-    reg::Reg{D}
-    get_trial_state!::GS
-    boundary_forces!::BF
-    project_circ!::PC
-    vort2flux!::VF
+    reg::R
+    get_trial_state!::G
+    boundary_forces!::B
+    project_circ!::C
+    vort2flux!::V
 end
 
 function Solver(prob::Problem{<:StreamFcnFluid{<:StreamFcnGrid}}, state::State)
@@ -225,7 +225,8 @@ function Solver(prob::Problem{<:StreamFcnFluid{<:StreamFcnGrid}}, state::State)
     B_times = B_Times(;
         vort2flux, Ainv=Ainvs[1], E, C, Γtmp=Γtmp2, qtmp=qtmp2, Γ=Γtmp, ψ=ψtmp, q=qtmp
     )
-    Binv = Binv_linearmap(prob, B_times)
+    B = B_linearmap(prob, B_times)
+    Binv = Binv_linearmap(prob, B)
 
     get_trial_state = GetTrialState(;
         prob, nonlinear, vort2flux, As, Ainvs, rhsbc=Γtmp2, rhs=Γtmp3, bc=Γbc

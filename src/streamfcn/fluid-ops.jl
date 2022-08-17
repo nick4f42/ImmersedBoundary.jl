@@ -495,8 +495,6 @@ function (mem::Nonlinear)(
     mul!(nonlin, C', fq)
 
     # Scaling: 1/hc^2 to convert circulation to vorticity
-    # plus factor of 4 from averaging across cells above
-    # (applies to flux field, but this avoids a second operation)
     hc = gridstep(grid, lev) # Coarse grid spacing
     nonlin .*= 1 / hc^2
 
