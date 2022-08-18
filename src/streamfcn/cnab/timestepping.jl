@@ -217,7 +217,9 @@ function Solver(prob::Problem{<:StreamFcnFluid{<:StreamFcnGrid}}, state::State)
     Δinv = lap_inv_linearmap(lap_inv)
 
     vort2flux = Vort2Flux(; domain, Δinv, ψbc=Γbc, Γtmp=Γtmp1)
-    nonlinear = Nonlinear(; domain, C, fq=qtmp1, Q=qtmp2)
+
+    rhs_force = RhsForce(; domain, Q=qtmp1)
+    nonlinear = Nonlinear(; rhs_force, C, fq=qtmp2)
 
     # reg must be updated if bodies move relative to the grid
     reg = Reg(domain, quantities(state).points)

@@ -141,3 +141,28 @@ function (mem::B_Times)(x::AbstractVector, z::AbstractVector)
     # Interpolate onto the body
     @views mul!(x, E, q[:, 1])
 end
+
+@with_kw struct Nonlinear{R<:RhsForce,M}
+    rhs_force::R
+    C::M
+    fq::Vector{Float64}
+end
+
+function (mem::Nonlinear)(
+    nonlin::AbstractVector, qty::StreamFcnQuantities, Γbc::AbstractVector, lev::Int
+)
+    grid = discretize(mem.rhs_force.domain)
+    @unpack C, fq = mem
+
+    # Get flux-circulation product
+    mem.rhs_force(fq, qty, Γbc, lev)
+
+    # Divergence of flux-circulation product
+    mul!(nonlin, C', fq)
+
+    # Scaling: 1/hc^2 to convert circulation to vorticity
+    hc = gridstep(grid, lev) # Coarse grid spacing
+    nonlin .*= 1 / hc^2
+
+    return nothing
+end

@@ -471,32 +471,22 @@ function (mem::Vort2Flux)(ψ::AbstractMatrix, q::AbstractMatrix, Γ::AbstractMat
     return nothing
 end
 
-@with_kw struct Nonlinear{D<:StreamFcnGrid,M}
+@with_kw struct RhsForce{D<:StreamFcnGrid}
     domain::D
-    C::M
-    fq::Vector{Float64}
     Q::Vector{Float64}
 end
 
-function (mem::Nonlinear)(
-    nonlin::AbstractVector, qty::StreamFcnQuantities, Γbc::AbstractVector, lev::Int
+function (mem::RhsForce)(
+    fq::AbstractVector, qty::StreamFcnQuantities, Γbc::AbstractVector, lev::Int
 )
-    @unpack domain, C, fq, Q = mem
+    @unpack domain, Q = mem
     @unpack nx, ny = domain
-    grid = discretize(domain)
 
     Γ = unflatten_circ(qty.Γ, domain, lev) # Circulation at this grid level
     avg_flux!(Q, qty, domain, lev) # Compute average fluxes across cells
 
     # Call helper function to loop over the arrays and store product in fq
     direct_product!(fq, Q, Γ, Γbc, domain)
-
-    # Divergence of flux-circulation product
-    mul!(nonlin, C', fq)
-
-    # Scaling: 1/hc^2 to convert circulation to vorticity
-    hc = gridstep(grid, lev) # Coarse grid spacing
-    nonlin .*= 1 / hc^2
 
     return nothing
 end
