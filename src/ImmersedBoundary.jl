@@ -4,7 +4,7 @@ using Reexport
 
 export SchemeRKC, SchemeCNAB
 export AbstractState, AbstractQuantities, AbstractSolver, Problem
-export fluidof, bodygroup, schemeof, timestep, quantities, discretize
+export fluidof, bodygroup, schemeof, timestep, quantities, discretize, problemof
 export advance!, initstate, initsolver
 
 function discretize end
@@ -12,6 +12,7 @@ function advance! end
 function statetype end
 function solvertype end
 function quantities end
+function problemof end
 
 include("dynamics.jl")
 include("schemes.jl")
@@ -36,9 +37,11 @@ struct Problem{F<:AbstractFluid,B<:BodyGroup,S<:AbstractScheme}
     scheme::S
 end
 
+include("solve.jl")
 include("streamfcn/streamfcn.jl")
 
 @reexport using .StreamFcn: StreamFcnFluid
+export StopIteration, each_timestep, at_times, at_indices, solve, solve!
 
 fluidof(prob::Problem) = prob.fluid
 bodygroup(prob::Problem) = prob.bodies

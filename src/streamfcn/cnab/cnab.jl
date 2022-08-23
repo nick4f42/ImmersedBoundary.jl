@@ -17,7 +17,7 @@ using ...ImmersedBoundary.Bodies
 using ...ImmersedBoundary.Fluids
 using ..StreamFcn
 
-import ...ImmersedBoundary: advance!, quantities, statetype, solvertype
+import ...ImmersedBoundary: advance!, quantities, statetype, solvertype, problemof
 
 include("states.jl")
 include("ops.jl")

@@ -188,6 +188,8 @@ struct Solver{
     vort2flux!::V
 end
 
+problemof(solver::Solver) = solver.prob
+
 function Solver(prob::Problem{<:StreamFcnFluid{<:StreamFcnGrid}}, state::State)
     bodies = bodygroup(prob)
     fluid = fluidof(prob)
